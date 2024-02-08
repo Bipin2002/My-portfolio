@@ -1,0 +1,25 @@
+.certificates {
+    
+    height: auto;
+    width: cover;
+    color: aquamarine;
+    background-color: black;
+    text-align: center;
+    border-bottom: solid 1px white;
+    padding: 100px 20px 100px 20px;
+}
+
+.certificates .show_achievements{
+   margin-top: 40px;
+    display: grid;
+    grid-template-columns:repeat(3,1fr) ;
+}
+.certificates .show_achievements .hello{
+    width: cover;
+    height: auto;
+}
+.certificates .show_achievements .hello .image{
+    width: cover;
+    height: auto;
+}
+

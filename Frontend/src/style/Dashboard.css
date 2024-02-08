@@ -1,0 +1,152 @@
+.main{
+    margin: 0;
+    padding: 0;
+    height: auto;
+    background-color: blue;
+}
+
+.main .menu{
+
+    height: 95px;
+    width: 100%;
+    background-color: black;
+    border-bottom: solid 1px white;
+    box-shadow: 0 0 20px 0 white;
+    position: fixed;
+    /* display: flex; 
+    justify-content: center;
+    align-items: center;
+  */
+}
+.main .menu h1{
+    color: rgb(191, 186, 186);
+    text-align: center;
+
+}
+.main .menu ul{
+    margin-top: 10px;
+    display: flex;
+
+    justify-content: center;
+    gap: 50px;
+}
+.main .menu ul li {
+
+    list-style-type: none;
+}
+.main .menu ul li button{
+    width: 100px;
+    height: 30px;
+    color: rgb(191, 186, 186);
+    border-radius: 3px;
+    border: solid 1px aqua;
+    background-color: transparent;
+
+   
+}
+
+
+.main .body{
+    margin: 0;
+    padding: 0;
+    padding-top: 100px;
+    min-height: 100vh;
+    max-height: auto;
+    width: cover;
+    background-color: black;
+    display: grid;
+    grid-template-columns: 100%;  
+}
+
+.main .body .add_projects,
+.add_blogs,
+.add_works,
+.add_achievements{
+    display: grid;
+    grid-template-columns: 25% 75%;
+}
+
+.main .body .add{
+
+    padding: 20px 20px 0 20px;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    gap: 20px;
+    width: 20%;
+    height: 100%;
+    border-right: solid 1px white;
+   
+}
+.main .body .add form{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+   
+   
+}
+.main .body .add form label{
+   color: aqua;
+}
+.main .body .add form input{
+    height: 30px;
+    width: 100%;
+    border: solid 2px aquamarine;
+    background-color: rgb(191, 186, 186);
+    border-radius: 10px;
+}
+
+
+
+
+.main .body 
+h1{
+    color: rgb(191,186,186);
+    text-align: center;
+    
+
+    
+}
+.main .body 
+button{
+    width: 100px;
+    height: 30px;
+    font-size: 15px;
+    color: rgb(191,186,186);
+    border: solid 2px aquamarine;
+    background-color: transparent;
+    border-radius: 10px;
+    
+}
+
+.main .body .show{
+    height: auto;
+    width: cover;
+    text-align: center;
+    padding: 10px;
+    color: red;
+}
+.main .body .show h2{
+    color: aquamarine;
+    text-align: center;   
+}
+.main .body .show img{
+    height: auto;
+    max-width: 100%;
+}
+.main .body .show p{
+    color: rgb(191,186,186);
+    font-size: 0.8em;
+    text-align:justify;
+    padding-right: 20px;
+
+}
+.main .body .show .info{
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 50% 50%;
+    gap: 20px;
+    border: solid 1px white;
+    margin: 10px;
+    border-radius: 10px;
+}

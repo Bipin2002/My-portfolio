@@ -12,7 +12,7 @@ function ManageProjects() {
     });
     const [projects, setProjects] = useState([]);
     const [editingProjectId, setEditingProjectId] = useState(null);
-
+    console.log(editingProjectId)
 
     const handleChange = (e) => {
         if (e.target.name === 'projectimage') {

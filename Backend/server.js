@@ -1,58 +1,65 @@
 const express = require('express');
+const session = require('express-session');
+
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const { sign } = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const path = require('path');
-
-const { User, Project, Blog, Work, Achievement } = require('./models.js');
+const ObjectId = require('mongoose').Types.ObjectId; 
+const { User, Project, Blog, Work, Achievement,PersonalData } = require('./models.js');
 require('./db');
 
 
 const app = express();
 const PORT = 5000;
 
+app.use(bodyParser.json());
+
 app.use(cors());
 app.use(bodyParser.json());
 
-// app.use(session({
-//   secret: 'your_secret_key',
-//   resave: false,
-//   saveUninitialized: false
-// }));
+app.use(session({
+  secret: '1234567890@abc',
+  resave: false,
+  saveUninitialized: true
+}));
+
+
 
 app.post('/signup', async (req, res) => {
-  const { username, email, password } = req.body;
-  const hashedPassword = await bcrypt.hash(password, 10);
-
   try {
-    const user = new User({ username, email, password: hashedPassword });
+    const { username,email, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User({ username,email, password: hashedPassword });
     await user.save();
     res.status(201).json({ message: 'User created successfully' });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
 app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-
   try {
+    const { username, password } = req.body;
     const user = await User.findOne({ username });
-
-    if (user && bcrypt.compare(password, user.password)) {
-      const token = sign({ username }, 'secret_key', { expiresIn: '1h' });
-      res.json({ token });
-    } else {
-      res.status(401).json({ error: 'Invalid credentials' });
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid username or password' });
     }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+    const token = jwt.sign({ userId: user._id }, 'secret_key', { expiresIn: '1h' });
+    res.json({ token });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
-
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -64,6 +71,51 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
+
+app.post('/createData/:userId',  upload.single('profileImage'), async (req, res) => {
+  const userId = req.params.userId;
+  const { firstname, lastname, designation, email, summary, phone_no, address} = req.body;
+  const profileImage = req.file ? `http://localhost:5000/uploads/${req.file.originalname}` : 'Hello';
+
+  try {
+  
+    console.log(userId)
+    
+    await PersonalData.create({
+      image: profileImage,
+      firstname: firstname,
+      lastname: lastname,
+      designation: designation,
+      email: email,
+      summary: summary,
+      contact: phone_no,
+      address: address,
+      user:userId,
+    });
+    res.status(201).json({ message: 'created successfully' });
+  } catch (error) {
+    console.error(error); // Log the error for debugging
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/getData/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    console.log(userId)
+    const data1 = await PersonalData.findOne({ userId }); 
+    console.log(data1)
+    if (!data1) {
+      return res.status(404).json({ error: 'Data not found' });
+    }
+
+    res.status(200).json({ data1 });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 app.post('/createProject', upload.single('projectimage'), async (req, res) => {
   const { projectname, Projectdescription, ProjectUrl } = req.body;
@@ -80,6 +132,7 @@ app.post('/createProject', upload.single('projectimage'), async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
 
 

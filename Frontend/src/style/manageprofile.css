@@ -1,0 +1,47 @@
+.manageprofile {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+  }
+  
+  .manageprofile h1 {
+    text-align: center;
+  }
+  
+  .manageprofile form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .manageprofile label {
+    margin-bottom: 5px;
+  }
+  
+  .manageprofile input[type="file"],
+  .manageprofile input[type="text"],
+  .manageprofile input[type="email"],
+  .manageprofile textarea {
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+  
+  .manageprofile button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .manageprofile button:hover {
+    background-color: #0056b3;
+  }
+  

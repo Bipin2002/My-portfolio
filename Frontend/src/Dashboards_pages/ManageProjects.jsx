@@ -1,7 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import "../style/Dashboard.css";
+import { jwtDecode } from "jwt-decode";
+
 
 function ManageProjects() {
     const [projectData, setProjectData] = useState({
@@ -28,6 +30,16 @@ function ManageProjects() {
         }
     };
 
+    const [userId, setUserId] = useState("");
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+          const decoded = jwtDecode(token);
+          setUserId(decoded.userId);
+        }
+      }, []);
+
     const handleAddProject = async () => {
         try {
             const formData = new FormData();
@@ -45,7 +57,7 @@ function ManageProjects() {
              
                 
             } else {
-                await axios.post('http://localhost:5000/createProject', formData, {
+                await axios.post(`http://localhost:5000/createProject/${userId}`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
@@ -70,15 +82,15 @@ function ManageProjects() {
         }
     }
 
-    const fetchProjects = async () => {
+    const fetchProjects = useCallback(async () => {
         try {
-            const response = await axios.get('http://localhost:5000/getProjects');
+            const response = await axios.get(`http://localhost:5000/getProjects/${userId}`);
 
             setProjects(response.data.projects);
         } catch (error) {
             console.error(error.response?.data?.error || 'Something went wrong');
         }
-    };
+    },[userId]);
 
 
     const handleDelete = async (id) => {
@@ -103,7 +115,7 @@ function ManageProjects() {
 
     useEffect(() => {
         fetchProjects();
-    }, []);
+    }, [fetchProjects]);
     return (
         <section className='add_projects'>
             <div className="add">

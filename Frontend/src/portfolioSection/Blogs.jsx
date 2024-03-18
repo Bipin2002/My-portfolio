@@ -1,19 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 function Blogs() {
     const [blogs, setblogs] = useState([]);
-    const fetchblogs = async () => {
+    const [userId, setUserId] = useState("");
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+          const decoded = jwtDecode(token);
+          setUserId(decoded.userId);
+        }
+      }, []);
+    const fetchblogs = useCallback( async () => {
         try {
-            const response = await axios.get('http://localhost:5000/getblogs');
+            const response = await axios.get(`http://localhost:5000/getblogs/${userId}`);
             setblogs(response.data.blogs);
         } catch (error) {
             console.error(error);
         }
-    };
+    },[userId]);
     useEffect(() => {
         fetchblogs();
-    }, []);
+    }, [fetchblogs]);
 
     return (
         <section id='blogs' className="blogs">

@@ -1,22 +1,34 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
+import { jwtDecode } from "jwt-decode";
+
 
 function MyProject() {
 
     const [projects, setProjects] = useState([]);
+    const [userId, setUserId] = useState("");
 
-    const fetchProjects = async () => {
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+          const decoded = jwtDecode(token);
+          setUserId(decoded.userId);
+        }
+      }, []);
+
+
+    const fetchProjects = useCallback( async () => {
         try {
-            const response = await axios.get('http://localhost:5000/getProjects');
+            const response = await axios.get(`http://localhost:5000/getProjects/${userId}`);
 
             setProjects(response.data.projects);
         } catch (error) {
             console.error(error.response?.data?.error || 'Something went wrong');
         }
-    };
+    },[userId]);
     useEffect(() => {
         fetchProjects();
-    }, []);
+    }, [fetchProjects]);
 
     return (
         <section id='projects' className="projects">

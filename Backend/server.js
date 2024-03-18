@@ -154,7 +154,8 @@ app.get('/getData/:userId', async (req, res) => {
 
 
 
-app.post('/createProject', upload.single('projectimage'), async (req, res) => {
+app.post('/createProject/:userId', upload.single('projectimage'), async (req, res) => {
+  const userId = req.params.userId;
   const { projectname, Projectdescription, ProjectUrl } = req.body;
   const projectimage = req.file ? `http://localhost:5000/uploads/${req.file.originalname}` : 'Hello';
   try {
@@ -163,7 +164,8 @@ app.post('/createProject', upload.single('projectimage'), async (req, res) => {
       name: projectname,
       image: projectimage,
       description: Projectdescription,
-      url: ProjectUrl
+      url: ProjectUrl,
+      user: userId,
     });
     res.status(201).json({ message: 'Project created successfully' });
   } catch (error) {
@@ -177,9 +179,12 @@ app.post('/createProject', upload.single('projectimage'), async (req, res) => {
 
 
 
-app.get('/getProjects', async (req, res) => {
+app.get('/getProjects/:userId', async (req, res) => {
+  const userId = req.params.userId;
+
   try {
-    const projects = await Project.find();
+    const user = await User.findById(userId);
+    const projects = await Project.find({user : user._id});
     res.status(200).json({ projects });
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
@@ -228,7 +233,9 @@ app.delete('/deleteprojects/:id', async (req, res) => {
 
 
 
-app.post('/createblogs', upload.single('blogimage'), async (req, res) => {
+app.post('/createblogs/:userId', upload.single('blogimage'), async (req, res) => {
+  const userId = req.params.userId;
+
   const { blogname, blogdescription, blogUrl } = req.body;
   const blogimage = req.file ? `http://localhost:5000/uploads/${req.file.originalname}` : 'Hello';
   try {
@@ -236,7 +243,8 @@ app.post('/createblogs', upload.single('blogimage'), async (req, res) => {
       name: blogname,
       image: blogimage,
       description: blogdescription,
-      url: blogUrl
+      url: blogUrl,
+      user: userId,
     });
 
     res.status(201).json({ message: 'blog created successfully' });
@@ -247,9 +255,10 @@ app.post('/createblogs', upload.single('blogimage'), async (req, res) => {
 
 
 
-app.get('/getblogs', async (req, res) => {
+app.get('/getblogs/:userId', async (req, res) => {
+  const userId = req.params.userId;
   try {
-    const blogs = await Blog.find();
+    const blogs = await Blog.find({user: userId});
     res.status(200).json({ blogs });
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
@@ -297,7 +306,8 @@ app.delete('/deleteblog/:id', async (req, res) => {
 });
 
 
-app.post('/createworks', upload.single('workimage'), async (req, res) => {
+app.post('/createworks/:userId', upload.single('workimage'), async (req, res) => {
+  const userId = req.params.userId;
   const { workname, workdescription } = req.body;
   const workimage = req.file ? `http://localhost:5000/uploads/${req.file.originalname}` : '';
 
@@ -306,6 +316,7 @@ app.post('/createworks', upload.single('workimage'), async (req, res) => {
       name: workname,
       image: workimage,
       description: workdescription,
+      user : userId,
     });
 
     res.status(201).json({ message: 'work created successfully' });
@@ -314,14 +325,16 @@ app.post('/createworks', upload.single('workimage'), async (req, res) => {
   }
 });
 
-app.get('/getworks', async (req, res) => {
+app.get('/getworks/:userId', async (req, res) => {
+  const userId = req.params.userId;
   try {
-    const works = await Work.find();
+    const works = await Work.find({user: userId});
     res.status(200).json({ works });
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 app.put('/editwork/:id', upload.single('workimage'), async (req, res) => {
   const workId = req.params.id;
   const { workname, workdescription } = req.body;
@@ -329,17 +342,17 @@ app.put('/editwork/:id', upload.single('workimage'), async (req, res) => {
   console.log(workimage)
   try {
     if (!workimage) {
-      await Work.create({
+      await Blog.findByIdAndUpdate(workId, {
         name: workname,
         description: workdescription,
       });
+      
     } else {
-      await Work.create({
+      await Blog.findByIdAndUpdate(workId, {
         name: workname,
         image: workimage,
         description: workdescription,
       });
-  
     }
 
     res.status(200).json({ message: 'Project updated successfully' });
@@ -360,17 +373,16 @@ app.delete('/deletework/:id', async (req, res) => {
 });
 
 
-app.post('/createachievement', upload.single('achievementimage'), async (req, res) => {
+app.post('/createachievement/:userId', upload.single('achievementimage'), async (req, res) => {
+  const userId = req.params.userId;
   const { achievementname, achievementdate } = req.body;
   const achievementimage = req.file ? `http://localhost:5000/uploads/${req.file.originalname}` : 'Hello';
-  console.log(achievementimage)
-  console.log(achievementname)
-  console.log(achievementdate)
   try {
     await Achievement.create({
       name: achievementname,
       image: achievementimage,
       date: achievementdate,
+      user: userId,
     });
 
     res.status(201).json({ message: 'achievement created successfully' });
@@ -380,9 +392,10 @@ app.post('/createachievement', upload.single('achievementimage'), async (req, re
 });
 
 
-app.get('/getachievements', async (req, res) => {
+app.get('/getachievements/:userId', async (req, res) => {
+  const userId = req.params.userId;
   try {
-    const achievements = await Achievement.find();
+    const achievements = await Achievement.find({user:userId});
     res.status(200).json({ achievements });
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });

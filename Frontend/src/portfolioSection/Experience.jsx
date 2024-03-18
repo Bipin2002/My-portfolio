@@ -1,20 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 function Experience() {
     const [works, setworks] = useState([]);
-    const fetchworks = async () => {
+
+    const [userId, setUserId] = useState("");
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+          const decoded = jwtDecode(token);
+          setUserId(decoded.userId);
+        }
+      }, []);
+
+    const fetchworks = useCallback( async () => {
         try {
-            const response = await axios.get('http://localhost:5000/getworks');
+            const response = await axios.get(`http://localhost:5000/getworks/${userId}`);
 
             setworks(response.data.works);
         } catch (error) {
             console.error(error.response?.data?.error || 'Something went wrong');
         }
-    };
+    }, [userId]);
     useEffect(() => {
         fetchworks();
-    }, []);
+    }, [fetchworks]);
     return (
         <section id='Experience' className="Experience">
             <h1>Experience And Volunteer</h1>

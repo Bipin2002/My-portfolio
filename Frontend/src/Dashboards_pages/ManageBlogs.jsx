@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
+
 
 function ManageBlogs() {
     const [blogData, setBlogData] = useState({
@@ -10,6 +12,15 @@ function ManageBlogs() {
     });
     const [blogs, setblogs] = useState([]);
     const [editingBlogId, setEditingBlogId] = useState(null);
+    const [userId, setUserId] = useState("");
+
+    useEffect(() => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        const decoded = jwtDecode(token);
+        setUserId(decoded.userId);
+      }
+    }, []);
 
 
     const handleChange = (e) => {
@@ -43,7 +54,7 @@ function ManageBlogs() {
 
 
             } else {
-                await axios.post('http://localhost:5000/createblogs', formData, {
+                await axios.post(`http://localhost:5000/createblogs/${userId}`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
@@ -77,14 +88,14 @@ function ManageBlogs() {
         setEditingBlogId(id);
     };
 
-    const fetchBlogs = async () => {
+    const fetchBlogs = useCallback( async () => {
         try {
-            const response = await axios.get('http://localhost:5000/getblogs');
+            const response = await axios.get(`http://localhost:5000/getblogs/${userId}`);
             setblogs(response.data.blogs);
         } catch (error) {
             console.error(error);
         }
-    };
+    },[userId]);
 
     const handleDelete = async (id) => {
         try {
@@ -99,7 +110,7 @@ function ManageBlogs() {
 
     useEffect(() => {
         fetchBlogs();
-    }, []);
+    }, [fetchBlogs]);
     return (
         <section className='add_blogs'>
             <div className="add">

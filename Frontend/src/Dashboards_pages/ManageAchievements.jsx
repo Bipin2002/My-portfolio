@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 function ManageAchievements() {
   const [achievementsData, setAchievementsData] = useState({
@@ -8,8 +9,15 @@ function ManageAchievements() {
     achievementdate: '',
   });
   const [Achievements, setAchievements] = useState([]);
-  // const [editingAchievementId, setEditingAchievementId] = useState(null);
+  const [userId, setUserId] = useState("");
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decoded = jwtDecode(token);
+      setUserId(decoded.userId);
+    }
+  }, []);
 
   const handleChange = (e) => {
     if (e.target.name === 'achievementimage') {
@@ -24,7 +32,7 @@ function ManageAchievements() {
       });
     }
   };
-  
+
 
   const handleAddachievements = async () => {
     try {
@@ -33,7 +41,7 @@ function ManageAchievements() {
       formData.append('achievementname', achievementsData.achievementname);
       formData.append('achievementimage', achievementsData.achievementimage);
       formData.append('achievementdescription', achievementsData.achievementdate);
-      await axios.post('http://localhost:5000/createachievement', formData, {
+      await axios.post(`http://localhost:5000/createachievement/${userId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -48,25 +56,15 @@ function ManageAchievements() {
       console.error(error.response.data.error || 'Something went wrong');
     }
   };
-  // const handleEdit = (id) => {
-  //   const achievementToEdit = achievements.find((achievement) => achievement._id === id);
-  //   setAchievementsData({
-  //     achievementname: achievementToEdit.name,
-  //     achievementimage: achievementToEdit.image,
-  //     achievementdate: achievementToEdit.description,
-  //   });
-  //   setEditingAchievementId(id);
-  // };
 
-  const fetchachievement = async () => {
+  const fetchachievement = useCallback( async () => {
     try {
-      const response = await axios.get('http://localhost:5000/getachievements');
-      console.log(response.data.achievements); // Add this line for debugging
+      const response = await axios.get(`http://localhost:5000/getachievements/${userId}`);
       setAchievements(response.data.achievements);
     } catch (error) {
       console.error(error.response?.data?.error || 'Something went wrong');
     }
-  };
+  },[userId]);
 
   const handleDelete = async (id) => {
     try {
@@ -81,7 +79,7 @@ function ManageAchievements() {
 
   useEffect(() => {
     fetchachievement();
-  }, []);
+  }, [fetchachievement]);
   return (
     <section className='add_achievements'>
       <div className="add">

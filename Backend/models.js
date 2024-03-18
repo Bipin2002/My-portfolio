@@ -14,6 +14,7 @@ const Project = model('Project', {
   image: {type: String, required: true,},
   description: {type: String,required: true,},
   url: {type: String,},
+  user: { type: Schema.Types.ObjectId, ref: 'Users' },
 });
 
 const Blog = model('Blog', {
@@ -21,17 +22,23 @@ const Blog = model('Blog', {
   image: {type: String, required: true,},
   description: {type: String,required: true,},
   url: {type: String,},
+  user: { type: Schema.Types.ObjectId, ref: 'Users' },
+
 });
 const Work = model('Work', {
   name: {type: String, required: true,},
   image: {type: String, required: true,},
   description: {type: String,required: true,},
+  user: { type: Schema.Types.ObjectId, ref: 'Users' },
+
 });
 
 const Achievement = model('Achievements', {
   name: {type: String, required: true,},
   image: {type: String, required: true,},
   date: {type: String},
+  user: { type: Schema.Types.ObjectId, ref: 'Users' },
+
 });
 
 const PersonalData = model('personaldatas', {

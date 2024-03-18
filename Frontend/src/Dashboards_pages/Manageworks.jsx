@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 function Manageworks() {
   const [workData, setWorkData] = useState({
@@ -9,6 +10,15 @@ function Manageworks() {
   });
   const [works, setworks] = useState([]);
   const [editingWorkId, setEditingWorkId] = useState(null);
+  const [userId, setUserId] = useState("");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decoded = jwtDecode(token);
+      setUserId(decoded.userId);
+    }
+  }, []);
 
 
   const handleChange = (e) => {
@@ -25,6 +35,14 @@ function Manageworks() {
     }
   };
 
+  const fetchworks = useCallback(async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/getworks/${userId}`);
+      setworks(response.data.works);
+    } catch (error) {
+      console.error(error.response?.data?.error || 'Something went wrong');
+    }
+  }, [userId]);
 
   const handleAddwork = async () => {
     try {
@@ -39,16 +57,12 @@ function Manageworks() {
             'Content-Type': 'multipart/form-data',
           },
         });
-
-
       } else {
-        await axios.post('http://localhost:5000/createWorks', formData, {
+        await axios.post(`http://localhost:5000/createWorks/${userId}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
-
-
       }
       fetchworks();
       setWorkData({
@@ -57,10 +71,8 @@ function Manageworks() {
         workdescription: '',
       });
       setEditingWorkId(null);
-
     } catch (error) {
       console.error(error.response.data.error || 'Something went wrong');
-      console.log("hi")
     }
   };
 
@@ -83,20 +95,9 @@ function Manageworks() {
     }
   };
 
-  const fetchworks = async () => {
-    try {
-      const response = await axios.get('http://localhost:5000/getworks');
-
-      setworks(response.data.works);
-    } catch (error) {
-      console.error(error.response?.data?.error || 'Something went wrong');
-    }
-  };
-
   useEffect(() => {
     fetchworks();
-  }, []);
-
+  }, [fetchworks]);
 
   return (
     <section className='add_works'>
@@ -133,7 +134,6 @@ function Manageworks() {
                 <button type="button" onClick={() => handleDelete(data._id)}>Delete</button>
               </div>
             </div>
-
           ))
         ) : (
           <p>Loading Works...</p>
@@ -143,4 +143,4 @@ function Manageworks() {
   )
 }
 
-export default Manageworks
+export default Manageworks;

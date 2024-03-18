@@ -7,7 +7,7 @@
 
 .nav {
     display: grid;
-    height: 80px;
+    height: 60px;
     background-color: Black;
     grid-template-columns: 20% 60% 20%;
     justify-content: center;

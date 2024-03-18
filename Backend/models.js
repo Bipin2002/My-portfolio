@@ -35,16 +35,22 @@ const Achievement = model('Achievements', {
 });
 
 const PersonalData = model('personaldatas', {
-  image: {type: String, required: true,},
-  firstname: {type: String, required: true,},
-  lastname: {type: String, required: true,},
-  designation: {type: String, required: true,},
-  email: {type: String, required: true,},
-  summary: {type: String, required: true,},
-  contact: {type: String, required: true,},
-  address: {type: String, required: true,},
+  image: {type: String, },
+  firstname: {type: String, },
+  lastname: {type: String, },
+  designation: {type: String, },
+  email: {type: String, },
+  summary: {type: String, },
+  contact: {type: String, },
+  address: {type: String, },
+  messenger: {type: String},
+  facebook: {type: String},
+  instagram: {type: String},
+  linkedin: {type: String},
   user: { type: Schema.Types.ObjectId, ref: 'Users' },
 });
+
+
 
 module.exports = {
   User,

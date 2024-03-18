@@ -4,12 +4,11 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
-const { sign } = require('jsonwebtoken');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const path = require('path');
-const ObjectId = require('mongoose').Types.ObjectId; 
-const { User, Project, Blog, Work, Achievement,PersonalData } = require('./models.js');
+const ObjectId = require('mongoose').Types.ObjectId;
+const { User, Project, Blog, Work, Achievement, PersonalData } = require('./models.js');
 require('./db');
 
 
@@ -31,10 +30,26 @@ app.use(session({
 
 app.post('/signup', async (req, res) => {
   try {
-    const { username,email, password } = req.body;
+    const { username, email, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ username,email, password: hashedPassword });
+    const user = new User({ username, email, password: hashedPassword });
     await user.save();
+    const data = new PersonalData({
+      image: null,
+      firstname: '',
+      lastname: '',
+      designation: '',
+      email: email,
+      summary: '',
+      contact: '',
+      address: '',
+      messenger: '',
+      facebook: '',
+      instagram: '',
+      linkedin: '',
+      user: user._id,
+    });
+    await data.save();
     res.status(201).json({ message: 'User created successfully' });
   } catch (error) {
     console.error(error);
@@ -72,44 +87,47 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-app.post('/createData/:userId',  upload.single('profileImage'), async (req, res) => {
+app.post('/createData/:userId', upload.single('profileImage'), async (req, res) => {
   const userId = req.params.userId;
-  const { firstname, lastname, designation, email, summary, phone_no, address} = req.body;
-  const profileImage = req.file ? `http://localhost:5000/uploads/${req.file.originalname}` : 'Hello';
+  const { firstname, lastname, designation, email, summary, phone_no, address, messenger,facebook,instagram,linkedin } = req.body;
+  const profileImage = req.file ? `http://localhost:5000/uploads/${req.file.originalname}` : null;
 
   try {
-  
-    console.log(userId)
-    
-    await PersonalData.create({
-      image: profileImage,
-      firstname: firstname,
-      lastname: lastname,
-      designation: designation,
-      email: email,
-      summary: summary,
-      contact: phone_no,
-      address: address,
-      user:userId,
-    });
-    res.status(201).json({ message: 'created successfully' });
-  } catch (error) {
-    console.error(error); // Log the error for debugging
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
+    const user = await User.findById(userId);
 
-app.get('/getData/:userId', async (req, res) => {
-  try {
-    const userId = req.params.userId;
-    console.log(userId)
-    const data1 = await PersonalData.findOne({ userId }); 
-    console.log(data1)
-    if (!data1) {
-      return res.status(404).json({ error: 'Data not found' });
+    const hello = await PersonalData.findOne({ user: user._id });
+    if (!profileImage) {
+      await PersonalData.findByIdAndUpdate(hello._id, {
+        firstname: firstname,
+        lastname: lastname,
+        designation: designation,
+        email: email,
+        summary: summary,
+        contact: phone_no,
+        address: address,
+        messenger : messenger,
+        facebook : facebook,
+        instagram: instagram,
+        linkedin : linkedin,
+      });
+    } else {
+      await PersonalData.findByIdAndUpdate(hello._id, {
+        image: profileImage,
+        firstname: firstname,
+        lastname: lastname,
+        designation: designation,
+        email: email,
+        summary: summary,
+        contact: phone_no,
+        address: address,
+        messenger : messenger,
+        facebook : facebook,
+        instagram: instagram,
+        linkedin : linkedin,
+      });
     }
-
-    res.status(200).json({ data1 });
+    
+    res.status(201).json({ message: 'updated successfully' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -117,10 +135,30 @@ app.get('/getData/:userId', async (req, res) => {
 });
 
 
+app.get('/getData/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const personalData = await PersonalData.findOne({ user: user._id });
+    res.status(200).json({ personalData });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+
 app.post('/createProject', upload.single('projectimage'), async (req, res) => {
   const { projectname, Projectdescription, ProjectUrl } = req.body;
   const projectimage = req.file ? `http://localhost:5000/uploads/${req.file.originalname}` : 'Hello';
   try {
+
     await Project.create({
       name: projectname,
       image: projectimage,
@@ -148,18 +186,27 @@ app.get('/getProjects', async (req, res) => {
   }
 });
 
-app.put('/editproject/:id',upload.single('projectimage'), async (req, res) => {
+app.put('/editproject/:id', upload.single('projectimage'), async (req, res) => {
   const projectId = req.params.id;
   const { projectname, Projectdescription, ProjectUrl } = req.body;
   const projectimage = req.file ? `http://localhost:5000/uploads/${req.file.originalname}` : 'Hello';
 
   try {
-    await Project.findByIdAndUpdate(projectId, {
-      name: projectname,
-      image: projectimage,
-      description: Projectdescription,
-      url: ProjectUrl,
-    });
+    if (!projectimage) {
+      await Project.findByIdAndUpdate(projectId, {
+        name: projectname,
+        image: projectimage,
+        description: Projectdescription,
+        url: ProjectUrl,
+      });
+    } else{
+      await Project.findByIdAndUpdate(projectId, {
+        name: projectname,
+        description: Projectdescription,
+        url: ProjectUrl,
+      });
+    }
+    
 
     res.status(200).json({ message: 'Project updated successfully' });
   } catch (error) {
@@ -181,7 +228,7 @@ app.delete('/deleteprojects/:id', async (req, res) => {
 
 
 
-app.post('/createblogs',upload.single('blogimage'), async (req, res) => {
+app.post('/createblogs', upload.single('blogimage'), async (req, res) => {
   const { blogname, blogdescription, blogUrl } = req.body;
   const blogimage = req.file ? `http://localhost:5000/uploads/${req.file.originalname}` : 'Hello';
   try {
@@ -210,17 +257,27 @@ app.get('/getblogs', async (req, res) => {
 });
 
 
-app.put('/editblog/:id',upload.single('blogimage'), async (req, res) => {
+app.put('/editblog/:id', upload.single('blogimage'), async (req, res) => {
   const blogId = req.params.id;
   const { blogname, blogdescription, blogUrl } = req.body;
   const blogimage = req.file ? `http://localhost:5000/uploads/${req.file.originalname}` : 'Hello';
   try {
-    await Blog.findByIdAndUpdate(blogId, {
-      name: blogname,
-      image: blogimage,
-      description: blogdescription,
-      url: blogUrl,
-    });
+    if (!blogimage) {
+      await Blog.findByIdAndUpdate(blogId, {
+        name: blogname,
+        description: blogdescription,
+        url: blogUrl,
+      });
+      
+    } else {
+      await Blog.findByIdAndUpdate(blogId, {
+        name: blogname,
+        image: blogimage,
+        description: blogdescription,
+        url: blogUrl,
+      });
+    }
+    
 
     res.status(200).json({ message: 'Project updated successfully' });
   } catch (error) {
@@ -241,8 +298,8 @@ app.delete('/deleteblog/:id', async (req, res) => {
 
 
 app.post('/createworks', upload.single('workimage'), async (req, res) => {
-  const { workname,  workdescription } = req.body;
-  const workimage = req.file? `http://localhost:5000/uploads/${req.file.originalname}`:'';
+  const { workname, workdescription } = req.body;
+  const workimage = req.file ? `http://localhost:5000/uploads/${req.file.originalname}` : '';
 
   try {
     await Work.create({
@@ -265,18 +322,25 @@ app.get('/getworks', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-app.put('/editwork/:id',upload.single('workimage'), async (req, res) => {
+app.put('/editwork/:id', upload.single('workimage'), async (req, res) => {
   const workId = req.params.id;
   const { workname, workdescription } = req.body;
   const workimage = req.file ? `http://localhost:5000/uploads/${req.file.originalname}` : 'Hello';
   console.log(workimage)
   try {
-    await Work.findByIdAndUpdate(workId, {
-      name: workname,
-      image: workimage,
-      description: workdescription,
- 
-    });
+    if (!workimage) {
+      await Work.create({
+        name: workname,
+        description: workdescription,
+      });
+    } else {
+      await Work.create({
+        name: workname,
+        image: workimage,
+        description: workdescription,
+      });
+  
+    }
 
     res.status(200).json({ message: 'Project updated successfully' });
   } catch (error) {
@@ -296,7 +360,7 @@ app.delete('/deletework/:id', async (req, res) => {
 });
 
 
-app.post('/createachievement',upload.single('achievementimage'), async (req, res) => {
+app.post('/createachievement', upload.single('achievementimage'), async (req, res) => {
   const { achievementname, achievementdate } = req.body;
   const achievementimage = req.file ? `http://localhost:5000/uploads/${req.file.originalname}` : 'Hello';
   console.log(achievementimage)
@@ -314,25 +378,6 @@ app.post('/createachievement',upload.single('achievementimage'), async (req, res
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
-// app.put('/editachievement/:id',upload.single('achievementimage'), async (req, res) => {
-//   const achievementId = req.params.id;
-//   const { achievementname, achievementdescription } = req.body;
-//   const achievementimage = req.file ? `http://localhost:5000/uploads/${req.file.originalname}` : 'Hello';
-//   console.log(achievementimage)
-//   try {
-//     await Work.findByIdAndUpdate(achievementId, {
-//       name: achievementname,
-//       image: achievementimage,
-//       description: achievementdescription,
- 
-//     });
-
-//     res.status(200).json({ message: 'Project updated successfully' });
-//   } catch (error) {
-//     res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// });
 
 
 app.get('/getachievements', async (req, res) => {

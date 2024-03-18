@@ -13,7 +13,7 @@ function SignUp() {
         try {
             console.log("hello")
             await axios.post('http://localhost:5000/signup', { username, email, password });
-            navigate('/Admin');
+            navigate('/Login');
         } catch (error) {
             console.error(error.response.data.error || 'Something went wrong');
         }

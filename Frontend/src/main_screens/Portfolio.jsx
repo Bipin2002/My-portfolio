@@ -1,22 +1,81 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import '../style/Portfolio.css';
 import Home from '../portfolioSection/Home';
 import MyProject from '../portfolioSection/MyProject';
 import Blogs from '../portfolioSection/Blogs';
 import Experience from '../portfolioSection/Experience';
 import Achievements from '../portfolioSection/Achievements';
-// import AboutMe from '../portfolioSection/AboutMe';
-// import Resume from '../portfolioSection/Resume';
+import { jwtDecode } from 'jwt-decode';
+import axios from 'axios';
+
 
 function Portfolio() {
+    const [personalData, setPersonalData] = useState({
+        profileImage: null,
+        firstname: '',
+        lastname: '',
+        designation: '',
+        email: '',
+        summary: '',
+        phone_no: '',
+        address: '',
+        messenger: '',
+        facebook: '',
+        instagram: '',
+        linkedin: '',
+    });
+    const [userId, setUserId] = useState('');
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            const decoded = jwtDecode(token);
+            setUserId(decoded.userId);
+        }
+    }, []);
+
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(`http://localhost:5000/getData/${userId}`);
+                const fetchedData = response.data.personalData || {};
+
+                setPersonalData({
+                    profileImage: fetchedData.image || null,
+                    firstname: fetchedData.firstname || '',
+                    lastname: fetchedData.lastname || '',
+                    designation: fetchedData.designation || '',
+                    email: fetchedData.email || '',
+                    summary: fetchedData.summary || '',
+                    phone_no: fetchedData.contact || '',
+                    address: fetchedData.address || '',
+                    messenger: fetchedData.messenger || "",
+                    facebook: fetchedData.facebook || "",
+                    instagram: fetchedData.instagram || "",
+                    linkedin: fetchedData.linkedin || "",
+                });
+            } catch (error) {
+                console.error(error.response?.data?.error || 'Something went wrong');
+            }
+        };
+
+        fetchData();
+    }, [userId]);
+
+
+
+
+
+
     return (
         <div>
             <div className="nav">
-            
+
                 <h1>Portfolio</h1>
-          
-                
+
+
 
                 <ul>
                     <li><a href="#body">Home</a></li>
@@ -28,7 +87,7 @@ function Portfolio() {
                     <li><a href="#about">Contacts</a></li>
                 </ul>
                 <div className='button'>
-                    <a href="https://www.messenger.com/t/100012615256776"><button>Let's Talk</button></a>
+                    <a href={personalData.messenger}><button>Let's Talk</button></a>
 
                 </div>
 
@@ -41,33 +100,33 @@ function Portfolio() {
             <Achievements />
             {/* <AboutMe /> */}
             <footer id='about' className='about'>
-            <div className="info">
-                <h2>Bipin Nagarkoti</h2>
-                <p>As an IT student, I'm passionate about technology and eager to expand my skills in software development, design, and project management. I thrive on collaborating with others to contribute to innovative projects and look forward to a successful career in the IT industry. Continuous learning drives me to stay ahead in this everevolving field. Excited for the journey ahead!</p>
-                <h4>Contact: +977-9840248823</h4>
-                <h4>e-mail: nagarkotibipin07@gmail.com</h4>
-                <h4>Address: dakshinkali-2, Kathmandu</h4>
-                <div className='socials'>
-                    <ul>
-                        <li><a href="https://www.instagram.com/bipin_2058/"><img src="Instagram.png" alt="" /></a></li>
-                        <li><a href="https://www.facebook.com/Bipin2002/"><img src="facebook.png" alt="" /></a></li>
-                        <li><a href="https://www.linkedin.com/in/bipin-nagarkoti-28826a226/"><img src="Linked in.png" alt="" /></a></li>
+                <div className="info">
+                    <h2>{personalData.firstname} {personalData.lastname}</h2>
+                    <p>{personalData.summary}</p>
+                    <h4>Contact: {personalData.phone_no}</h4>
+                    <h4>e-mail: {personalData.email}</h4>
+                    <h4>Address: {personalData.address}</h4>
+                    <div className='socials'>
+                        <ul>
+                            <li><a href={personalData.instagram}><img src="Instagram.png" alt="" /></a></li>
+                            <li><a href={personalData.facebook}><img src="facebook.png" alt="" /></a></li>
+                            <li><a href={personalData.linkedin}><img src="Linked in.png" alt="" /></a></li>
 
-                    </ul>
+                        </ul>
+                    </div>
                 </div>
-            </div>
 
-            <div className="feedback">
-                <h2>Feedback</h2>
-                <label htmlFor="email"> Email Address</label>
-                <input type="email"  />
-                <label htmlFor="message">Message</label>
-                <input type="text"  />
-                <button>Send</button>
+                <div className="feedback">
+                    <h2>Feedback</h2>
+                    <label htmlFor="email"> Email Address</label>
+                    <input type="email" />
+                    <label htmlFor="message">Message</label>
+                    <input type="text" />
+                    <button>Send</button>
 
-            </div>
+                </div>
 
-        </footer>
+            </footer>
         </div>
     );
 }

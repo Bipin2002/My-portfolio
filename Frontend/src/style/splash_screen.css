@@ -52,12 +52,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 80px;
+    padding: 5px  80px;
     background:black;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6);
     position: sticky;
-    top: 0;
-    left: 0;
     z-index: 999;
 
 }
@@ -97,97 +95,54 @@
     bottom: -4px;
     left: 20px;
 }
+.splash .body_container{
+    display: grid;
+    grid-template-columns: 70% 25%;
+    gap: 2%;
+    padding: 3%;
+}
 
-.splash #offer{
-    height: 90vh;
+.splash .body_container #offer{
     width: 100%;
+    height: cover;
     background-size: cover;
     background-position: top 25% right 0;
-    padding: 0 80px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
+
+    text-align: justify;
 }
 
-.splash #offer h4{
-    padding: 15px;
-}
-.splash #offer h1{
+
+.splash .body_container #offer h1{
     color: #088178;
 }
-
-
-
-
-
-.splash footer{
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    background: #DCDCDC;
-}
-
-.splash footer .col{
+.splash .body_container .auth{
+    width: 100%;
+    height: auto;
+    background-position: top 25% right 0;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    margin-bottom: 20px;
+    align-items: center;
+    justify-content: center;
+
 }
 
-.splash footer .logo{
-    margin-bottom: 30px;
-}
 
-.splash footer h4{
-    font-size: 20px;
-    padding-bottom: 20px;
-}
+
+
+
+
 
 .splash .col p{
     font-size: 18px;
     margin: 0 0 8px 0;
 }
 
-.splash footer a{
-    font-size: 13px;
-    text-decoration: none;
-    color: #222;
-    margin-bottom: 10px;
-}
 
-.splash footer .follow{
-    margin-top: 20px;
-}
 
-.splash footer .follow i{
-    color: #272727;
-    padding-right: 4px;
-    cursor: pointer;
-    size: 50px;
-}
-
-.splash footer .install img{
-    margin: 10px 0 15px 0;
-    border: 1px solid #dce4e0;
-    border-radius: 5px;
-    box-shadow: 20px 20px 34px rgba(0, 0, 0, 0.3);
-}
-
-.splash footer .install img:hover{
-    box-shadow: 20px 20px 30px rgba(0, 0,0,0.06);
-}
-
-.splash footer .follow i:hover, .splash footer a:hover{
-    color: #088178;
-}
-
-.splash footer .copyright{
-    width: 100%;
-    text-align: center;
-}
-
-/* Start Media Query
 
 @media (max-width: 799px){
     #navbar1{
@@ -256,33 +211,5 @@
 }
 
 @media (max-width:477px){
-    .section-p1{
-        padding: 20px;
-    }
-   #header{
-    padding: 10px 30px;
-   }
-   h2{
-    font-size: 32px;
-   }
-   h1{
-    font-size: 38px;
-   }
-   p{
-    font-size: 12px;
-   }
-   #offer{
-    padding: 0 20px;
-    background-position: 55%;
-   }
-   #feature{
-    justify-content: space-between;
-   }
-   #feature .fe-box{
-    width: 155px;
-    margin: 0 0 15px 0;
-   }
-   #product .pro{
-    width: 90%;
-   }
-} */
+    
+}

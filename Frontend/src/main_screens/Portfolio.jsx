@@ -6,6 +6,8 @@ import MyProject from '../portfolioSection/MyProject';
 import Blogs from '../portfolioSection/Blogs';
 import Experience from '../portfolioSection/Experience';
 import Achievements from '../portfolioSection/Achievements';
+// import Resume from '../portfolioSection/Resume';
+
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 

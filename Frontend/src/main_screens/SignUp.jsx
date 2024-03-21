@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import '../style/SignUp.css';
-import { useNavigate } from 'react-router-dom';
+import {Link, useNavigate } from 'react-router-dom';
 
 function SignUp() {
     const [username, setUsername] = useState('');
@@ -13,7 +13,7 @@ function SignUp() {
         try {
             console.log("hello")
             await axios.post('http://localhost:5000/signup', { username, email, password });
-            navigate('/Login');
+            navigate('/');
         } catch (error) {
             console.error(error.response.data.error || 'Something went wrong');
         }
@@ -37,7 +37,9 @@ function SignUp() {
                     <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 </div>
                 <button type="button" onClick={handleSignup}>Sign up</button>
+                <Link className='link' to="/">Back to Home</Link>
             </form>
+            
         </div>
     );
 }
